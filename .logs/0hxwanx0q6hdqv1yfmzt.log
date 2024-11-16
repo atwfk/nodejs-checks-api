@@ -1,0 +1,1 @@
+{"check":{"id":"0hxwanx0q6hdqv1yfmzt","userPhone":"201154614242","protocol":"https","url":"github.com","method":"get","successCodes":[200,201,301,302],"timeoutSeconds":3,"state":"up","lastChecked":1731797715989},"outcome":{"error":false,"responseCode":200},"state":"up","alert":false,"time":1731797746195}
