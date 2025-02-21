@@ -1,4 +1,5 @@
+https/*
 .env
 .env.example
-https/*
+infra/*
 checks-key.pem
