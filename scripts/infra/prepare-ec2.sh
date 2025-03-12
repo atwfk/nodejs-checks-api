@@ -1,32 +1,25 @@
-# mount ebs volume
-lsblk
-sudo nvme list
+#!/bin/bash
 
-sudo mkfs -t ext4 /dev/xvdb
-sudo mkdir -p /mnt/ebs
-sudo mount /dev/xvdb /mnt/ebs
-df -h
+# Update and install dependencies
+echo "Updating system and installing dependencies..."
+apt update -y
+apt install -y unzip docker.io
 
-#install aws
-sudo snap install aws-cli --classic
+# Install AWS CLI
+echo "Installing AWS CLI..."
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+./aws/install
+echo "AWS CLI installed."
 
-# install docker 
-sudo apt update -y
-sudo apt install -y docker.io
-sudo systemctl start docker
-sudo systemctl enable docker
+# Start and enable Docker
+echo "Starting Docker..."
+systemctl start docker
+systemctl enable docker
+echo "Docker started and enabled."
 
-export TWILIO_ACCOUNT_SID=$(aws ssm get-parameter --name CHECKS_API_TWILIO_ACCOUNT_SID --with-decryption --query "Parameter.Value" --output text)
-export TWILIO_AUTH_TOKEN=$(aws ssm get-parameter --name CHECKS_API_TWILIO_AUTH_TOKEN --with-decryption --query "Parameter.Value" --output text)
-echo $TWILIO_ACCOUNT_SID
-echo $TWILIO_AUTH_TOKEN
+# Start Docker container
+echo "Starting Docker container..."
+docker run -p 80:80 -p 443:443 -p 3002:3002 -p 3003:3003 -v ~/.aws:/root/.aws -e NODE_ENV=production ahmedtwfiek/checks-api:latest
 
-docker run -p 3002:3002 -p 3003:3003 \                                                 
-  -e CHECKS_API_TWILIO_ACCOUNT_SID=$(aws ssm get-parameter --name CHECKS_API_TWILIO_ACCOUNT_SID --with-decryption --query "Parameter.Value" --output text) \
-  -e CHECKS_API_TWILIO_AUTH_TOKEN=$(aws ssm get-parameter --name CHECKS_API_TWILIO_AUTH_TOKEN --with-decryption --query "Parameter.Value" --output text) \
-  checks-api
-
-docker run -p 3002:3002 -p 3003:3003 \
-  -e CHECKS_API_TWILIO_ACCOUNT_SID=$TWILIO_ACCOUNT_SID \
-  -e CHECKS_API_TWILIO_AUTH_TOKEN=$TWILIO_AUTH_TOKEN \
-  ahmedtwfiek/checks-api:latest
+echo "Docker container started."
